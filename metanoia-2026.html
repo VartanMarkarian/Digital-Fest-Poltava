@@ -1,0 +1,305 @@
+<title>METANOIA 2026 — Digital Fest Poltava</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" href="favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="description" content="METANOIA — фестиваль сучасного діджитал мистецтва. 16.10–1.11.2026, Полтава." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Digital Fest Poltava" />
+<meta property="og:title" content="METANOIA 2026" />
+<meta property="og:description" content="METANOIA — фестиваль сучасного діджитал мистецтва. 16.10–1.11.2026, Полтава." />
+<meta property="og:url" content="https://digitalfestpoltava.com/metanoia-2026.html" />
+<meta property="og:image" content="https://digitalfestpoltava.com/img/metanoia-og.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="METANOIA 2026" />
+<meta name="twitter:description" content="METANOIA — фестиваль сучасного діджитал мистецтва. 16.10–1.11.2026, Полтава." />
+<meta name="twitter:image" content="https://digitalfestpoltava.com/img/metanoia-og.jpg" />
+<link rel="stylesheet" href="css/style.css?v=66" />
+
+<div class="metanoia-page">
+
+<svg style="position:absolute; width:0; height:0; overflow:hidden;" aria-hidden="true">
+  <defs>
+    <filter id="textDistort" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="2" seed="7" result="turb">
+        <animate attributeName="baseFrequency" values="0.02 0.05;0.035 0.08;0.02 0.05" dur="5s" repeatCount="indefinite" />
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="turb" scale="14" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+
+    <!-- органічний, асиметрично "воблячий" край лінзи дисторшн-кола -->
+    <filter id="lensWobble" x="-70%" y="-70%" width="240%" height="240%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.008 0.009" numOctaves="2" seed="9" result="turb">
+        <animate attributeName="baseFrequency" values="0.007 0.009;0.01 0.006;0.008 0.011;0.007 0.009" dur="8s" repeatCount="indefinite" />
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="turb" scale="30" xChannelSelector="R" yChannelSelector="G" result="warped" />
+      <feGaussianBlur in="warped" stdDeviation="10" />
+    </filter>
+    <mask id="lensMask" maskUnits="userSpaceOnUse" x="0" y="0" width="400" height="400">
+      <circle cx="200" cy="200" r="130" fill="#ffffff" filter="url(#lensWobble)" />
+    </mask>
+  </defs>
+</svg>
+
+<div id="splash">
+  <div class="splash-title">
+    <span class="g">
+      <span data-lang="ua"><span class="gateway-holo" data-text="МЕТАНОЯ">МЕТАНОЯ</span></span>
+      <span data-lang="en"><span class="gateway-holo" data-text="METANOIA">METANOIA</span></span>
+    </span>
+    <span class="g"><span class="gateway-holo" data-text="2026">2026</span></span>
+  </div>
+  <div class="splash-sub">
+    <span data-lang="ua">завантаження трансформації</span>
+    <span data-lang="en">loading the transformation</span>
+  </div>
+  <div class="splash-bar"></div>
+</div>
+
+<header class="site-header">
+  <a href="index.html" class="logo-mark">DIGITAL FEST POLTAVA</a>
+  <div class="lang-toggle">
+    <button data-set-lang="ua" class="active">UA</button>
+    <button data-set-lang="en">EN</button>
+  </div>
+</header>
+
+<section class="metanoia-banner">
+  <video autoplay muted loop playsinline>
+    <source src="video/baner-metanoia.mp4" type="video/mp4" />
+  </video>
+  <a class="open-call-btn" href="https://forms.gle/v2ZJouxGv1W3YhEM9" target="_blank" rel="noopener">
+    <span class="gateway-holo" data-text="OPEN CALL">OPEN CALL</span>
+  </a>
+</section>
+
+<section class="hero">
+  <div class="wrap">
+    <h1 class="hero-title">
+      <span data-lang="ua"><span class="gateway-holo" data-text="МЕТАНОЯ">МЕТАНОЯ</span></span>
+      <span data-lang="en"><span class="gateway-holo" data-text="METANOIA">METANOIA</span></span>
+    </h1>
+
+    <a class="detail-instagram" href="https://www.instagram.com/cat_ngo_poltava/" target="_blank" rel="noopener">
+      <img src="img/instagram-icon.png" alt="" />
+      <span>@cat_ngo_poltava</span>
+    </a>
+
+    <div class="hero-curators">
+      <span class="tag">
+        <span data-lang="ua">Куратори фестивалю</span>
+        <span data-lang="en">Festival curators</span>
+      </span>
+      <b><span data-lang="ua">Вартан Маркар'ян</span><span data-lang="en">Vartan Markarian</span></b>
+      <b><span data-lang="ua">Роксолана Дудка</span><span data-lang="en">Roksolana Dudka</span></b>
+    </div>
+
+    <div class="hero-meta">
+      <div>
+        <strong>
+          <span data-lang="ua">9–22 вересня 2026</span>
+          <span data-lang="en">Sep 9–22, 2026</span>
+        </strong>
+        <span class="tag">
+          <span data-lang="ua">Термін прийому заявок</span>
+          <span data-lang="en">Application period</span>
+        </span>
+      </div>
+      <div>
+        <strong>16.10–1.11.2026</strong>
+        <span class="tag">
+          <span data-lang="ua">Дати фестивалю</span>
+          <span data-lang="en">Festival dates</span>
+        </span>
+      </div>
+    </div>
+
+    <p class="metanoia-location">
+      <span data-lang="ua">Локація фестивалю — Полтавський художній музей (галерея мистецтв) імені Миколи Ярошенка, Полтава, Україна.</span>
+      <span data-lang="en">Festival location — Mykola Yaroshenko Poltava Art Museum (Art Gallery), Poltava, Ukraine.</span>
+    </p>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <div class="wrap about-grid">
+    <div class="about-text">
+      <h2 class="section-title">
+        <span data-lang="ua"><span class="gateway-holo" data-text="Про фестиваль">Про фестиваль</span></span>
+        <span data-lang="en"><span class="gateway-holo" data-text="About the festival">About the festival</span></span>
+      </h2>
+      <div data-lang="ua">
+        <p>
+          METANOIA – давньогрецьке поняття, що описує глибоку зміну мислення, сприйняття та внутрішнього стану людини.
+          Це не просто зміна думки, це момент, коли попередній спосіб бачити себе і світ більше не відповідає реальності.
+          Фестиваль сучасного діджитал мистецтва «METANOIA» розповідає про людину, яка змінюється разом зі світом, навіть
+          якщо не обирала цієї зміни.
+        </p>
+        <p>
+          Ми живемо в реальності, де великі історичні події перестали бути чимось далеким і винятковим, вони стали
+          частиною повсякденності. Світ змінюється політично, технологічно, соціально й фізично, іноді настільки швидко,
+          що людина не встигає усвідомити, що саме змінилося всередині неї. Війна в Україні є не темою, яку митці мусять
+          осмислювати, а середовищем, у якому сьогодні формується їхній досвід. Ми можемо не створювати мистецтво про
+          війну, але ми вже не можемо існувати поза її впливом.
+        </p>
+        <p>
+          Змінюється наше відчуття часу, тіла, дому, безпеки, близькості, пам'яті, майбутнього. Змінюється мова, якою ми
+          говоримо одне з одним, змінюється спосіб, у який ми споживаємо інформацію, взаємодіємо з технологіями та
+          сприймаємо реальність. «METANOIA» досліджує ці зміни не на рівні великих історичних наративів, а через
+          особистий досвід. Що відбувається з людиною, коли зовнішній світ постійно змушує її переосмислювати себе? / Де
+          проходить межа між адаптацією та трансформацією? / Що ми втрачаємо, коли вчимося жити в новій реальності і що
+          набуваємо? / Чи можемо ми залишатися собою, якщо самі умови нашого існування постійно змінюються?
+        </p>
+        <p>
+          Цифрові технології в цьому контексті – не просто інструмент, вони є частиною самого середовища, у якому
+          відбувається сучасна людина. Екран, алгоритм, штучний інтелект, віртуальна присутність, цифрова пам'ять,
+          генеративні системи, мережеві комунікації – усе це вже не зовнішні технології, якими ми користуємося. Вони
+          поступово змінюють те, як ми думаємо, пам'ятаємо, спілкуємося, бачимо себе та конструюємо власну реальність.
+          Тому фестиваль відкритий до робіт, у яких цифрове може бути: матеріалом; інструментом; середовищем;
+          співрозмовником; способом фіксації; способом дослідження; джерелом конфлікту; або об'єктом критичного
+          осмислення. Нас цікавить не технологічна складність роботи сама по собі, а що відбувається з людиною через
+          взаємодію з технологією.
+        </p>
+      </div>
+      <div data-lang="en">
+        <p>
+          METANOIA – an ancient Greek concept describing a profound change in a person's thinking, perception, and inner
+          state. It is not simply a change of mind, but a moment when the previous way of seeing oneself and the world no
+          longer corresponds to reality. The contemporary digital art festival “METANOIA” is about a person who changes
+          along with the world, even when they did not choose this change.
+        </p>
+        <p>
+          We live in a reality where major historical events have ceased to be something distant and exceptional; they
+          have become part of everyday life. The world is changing politically, technologically, socially, and physically,
+          sometimes so rapidly that a person does not have time to realize what exactly has changed within them. The war
+          in Ukraine is not a subject that artists are obliged to reflect on, but an environment in which their experience
+          is being formed today. We may not create art about the war, but we can no longer exist outside its influence.
+        </p>
+        <p>
+          Our sense of time, body, home, safety, closeness, memory, and future is changing. The language we use to
+          communicate with one another is changing, as is the way we consume information, interact with technology, and
+          perceive reality. “METANOIA” explores these changes not on the level of grand historical narratives, but through
+          personal experience. What happens to a person when the outside world constantly forces them to rethink
+          themselves? / Where is the boundary between adaptation and transformation? / What do we lose when we learn to
+          live in a new reality, and what do we gain? / Can we remain ourselves if the very conditions of our existence are
+          constantly changing?
+        </p>
+        <p>
+          In this context, digital technologies are not simply a tool; they are part of the very environment in which the
+          contemporary human exists. The screen, algorithm, artificial intelligence, virtual presence, digital memory,
+          generative systems, networked communications – all of these are no longer external technologies that we use.
+          They are gradually changing the way we think, remember, communicate, see ourselves, and construct our own
+          reality. Therefore, the festival is open to works in which the digital can be: a material; a tool; an
+          environment; an interlocutor; a means of documentation; a means of research; a source of conflict; or an object
+          of critical reflection. We are interested not in the technological complexity of the work itself, but in what
+          happens to a person through their interaction with technology.
+        </p>
+      </div>
+    </div>
+    <div>
+      <p class="eyebrow">
+        <span data-lang="ua">Фестиваль досліджує теми</span>
+        <span data-lang="en">The festival explores the themes of</span>
+      </p>
+      <ul class="themes">
+        <li>
+          <span data-lang="ua">культура як спосіб відновлення і виживання</span>
+          <span data-lang="en">culture as a means of recovery and survival</span>
+        </li>
+        <li>
+          <span data-lang="ua">цифрова пам'ять і медіа як свідки часу</span>
+          <span data-lang="en">digital memory and media as witnesses to time</span>
+        </li>
+        <li>
+          <span data-lang="ua">присутність і відсутність у віртуальному просторі</span>
+          <span data-lang="en">presence and absence in virtual space</span>
+        </li>
+        <li>
+          <span data-lang="ua">діалог між людиною, технологією і середовищем</span>
+          <span data-lang="en">dialogue between the human, technology, and the environment</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section section-tight" id="formats">
+  <div class="wrap">
+    <h2 class="section-title">
+      <span data-lang="ua"><span class="gateway-holo" data-text="Формати робіт">Формати робіт</span></span>
+      <span data-lang="en"><span class="gateway-holo" data-text="Work formats">Work formats</span></span>
+    </h2>
+    <div data-lang="ua">
+      <p>
+        Ми відкриті до будь-яких форм діджитал-мистецтва: VR / AR-проєкти, відеоарт, інтерактивні інсталяції,
+        аудіо-візуальні проєкти, digital sculpture, AI-art, експериментальні проєкти, що працюють з темами пам'яті,
+        простору, відновлення, технологій і культури, залучаючи діджитал-інструменти.
+      </p>
+      <p>Учасники можуть представити готовий твір або нову роботу, створену спеціально для фестивалю.</p>
+    </div>
+    <div data-lang="en">
+      <p>
+        We are open to any form of digital art: VR / AR projects, video art, interactive installations, audiovisual
+        projects, digital sculpture, AI art, experimental projects that work with themes of memory, space, recovery,
+        technology, and culture, using digital tools.
+      </p>
+      <p>Participants can present an existing work or a new work created specifically for the festival.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section section-tight" id="terms">
+  <div class="wrap">
+    <h2 class="section-title">
+      <span data-lang="ua"><span class="gateway-holo" data-text="Умови участі">Умови участі</span></span>
+      <span data-lang="en"><span class="gateway-holo" data-text="Participation terms">Participation terms</span></span>
+    </h2>
+    <div data-lang="ua">
+      <p>
+        Фестиваль має некомерційний формат. На жаль, ми не можемо покрити витрати на проїзд, проживання чи гонорари,
+        проте прагнемо створити живу мережу взаємодії та нове ком'юніті сучасних українських і міжнародних митців,
+        кураторів, дослідників. За можливості, ми будемо раді бачити учасників особисто в Полтаві, щоб об'єднати
+        цифровий і реальний простори, дати можливість обміну досвідом, спілкування й спільної творчості.
+      </p>
+    </div>
+    <div data-lang="en">
+      <p>
+        The festival is non-commercial. Unfortunately, we are unable to cover travel, accommodation, or artist fees;
+        however, we aim to create a living network of interaction and a new community of contemporary Ukrainian and
+        international artists, curators, and researchers. If possible, we will be happy to welcome participants in
+        person in Poltava, in order to bring together digital and physical spaces and provide an opportunity for
+        exchange of experience, communication, and collaborative creativity.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="metanoia-contact wrap" id="contacts">
+  <p class="eyebrow">
+    <span data-lang="ua">Питання</span>
+    <span data-lang="en">Questions</span>
+  </p>
+  <div data-lang="ua">
+    <p style="color:#d8d8d6; margin-bottom:16px;">Якщо у вас залишилися запитання, пишіть нам на електронну пошту:</p>
+  </div>
+  <div data-lang="en">
+    <p style="color:#d8d8d6; margin-bottom:16px;">If you have any questions, please feel free to contact us by email:</p>
+  </div>
+  <a class="mail-link" href="mailto:mvartanart@gmail.com">mvartanart@gmail.com</a>
+  <a class="mail-link" href="mailto:roxolana.art@gmail.com">roxolana.art@gmail.com</a>
+  <a class="detail-instagram" href="https://www.instagram.com/cat_ngo_poltava/" target="_blank" rel="noopener" style="margin-top:14px;">
+    <img src="img/instagram-icon.png" alt="" />
+    <span>@cat_ngo_poltava</span>
+  </a>
+</section>
+
+<footer class="footer">
+  <p class="footer-bottom">DIGITAL FEST POLTAVA — © 2026</p>
+</footer>
+
+</div>
+
+<script src="js/main.js?v=66"></script>
+<script src="js/distort-lens.js?v=66"></script>
