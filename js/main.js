@@ -413,7 +413,12 @@ function applyStoredLang() {
   buttons.forEach((b) => b.classList.remove("active"));
   const target = toggle.querySelector(`[data-set-lang="${lang}"]`);
   if (target) target.classList.add("active");
+  setPageLang(lang);
+}
+
+function setPageLang(lang) {
   document.body.classList.toggle("lang-en", lang === "en");
+  document.documentElement.lang = lang === "en" ? "en" : "uk";
 }
 
 function initLangToggle() {
@@ -426,7 +431,7 @@ function initLangToggle() {
       buttons.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       const lang = btn.getAttribute("data-set-lang");
-      document.body.classList.toggle("lang-en", lang === "en");
+      setPageLang(lang);
       try {
         localStorage.setItem(LANG_KEY, lang);
       } catch (e) {

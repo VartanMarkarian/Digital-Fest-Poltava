@@ -312,6 +312,14 @@ h1, h2, h3, .display {
   text-decoration: none;
 }
 .logo-mark span { color: var(--accent-cyan); }
+/* h1 навколо логотипу на головній — лише для пошуковиків, вигляд не змінює */
+.logo-h1 {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+.logo-h1 .logo-mark { display: block; }
 .header-right {
   display: flex;
   align-items: center;
