@@ -8,7 +8,30 @@ document.addEventListener("DOMContentLoaded", () => {
   initLangToggle();
   initLightboxes();
   initMobileNav();
+  initOpenCallsMenu();
 });
+
+/* Меню OPEN CALLS: на комп'ютері відкривається наведенням (CSS),
+   а натиск потрібен для сенсорних екранів і клавіатури */
+function initOpenCallsMenu() {
+  const menu = document.querySelector(".oc-menu");
+  if (!menu) return;
+  const btn = menu.querySelector(".oc-menu-btn");
+  const setOpen = (open) => {
+    menu.classList.toggle("open", open);
+    btn.setAttribute("aria-expanded", String(open));
+  };
+  btn.addEventListener("click", () => setOpen(!menu.classList.contains("open")));
+  document.addEventListener("click", (e) => {
+    if (!menu.contains(e.target)) setOpen(false);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setOpen(false);
+  });
+  menu.addEventListener("focusout", (e) => {
+    if (e.relatedTarget && !menu.contains(e.relatedTarget)) setOpen(false);
+  });
+}
 
 /* На дотикових екранах :hover недоступний, тож інверсія-глітч на портретах
    (у гріді учасників і на сторінці учасника) ніколи не спрацьовує.

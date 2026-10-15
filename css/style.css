@@ -1030,31 +1030,95 @@ span[data-lang="en"] { display: none; }
 .gateway-year { color: var(--accent-cyan); }
 .gateway-link:hover .gateway-title { opacity: 0.88; }
 
-/* OPEN CALL під «Метаноя 2026» — жовто-блакитний переливчастий напис */
-.gateway-opencall {
+/* меню OPEN CALLS у шапці головної, поруч із перемикачем мов */
+/* список прив'язаний до правого краю всього блоку, а не кнопки — щоб на вузьких екранах не вилазив за лівий край */
+.gateway-tools {
   position: relative;
-  z-index: 2;
-  display: inline-block;
-  margin-top: 16px;
-  text-decoration: none;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-family: "Neue Machina", "Nastup", sans-serif;
-  font-weight: 900;
-  font-size: clamp(1.19rem, 3.36vw, 2.71rem);
-  background: linear-gradient(100deg, #ffe066 0%, #ffd23f 22%, #6ec7ff 48%, #3fa9ff 62%, #ffe066 84%, #6ec7ff 100%);
-  background-size: 280% 280%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  animation: metalShift 7s linear infinite;
-  filter: drop-shadow(0 0 16px rgba(255,255,255,0.16));
-  transition: filter 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
-.gateway-col--metanoia .gateway-opencall { display: block; }
-.gateway-opencall:hover {
-  filter: saturate(1.8) brightness(1.15) drop-shadow(0 0 22px rgba(255,255,255,0.3));
+.oc-menu-btn,
+.header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--fg);
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.header-link:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+.oc-burger {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  width: 14px;
+}
+.oc-burger span {
+  display: block;
+  height: 2px;
+  background: currentColor;
+}
+.oc-menu-list {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding-top: 8px;
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--gap));
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+.oc-menu-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+}
+.oc-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 16px;
+  color: var(--fg);
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+.oc-menu-name { font-family: "Neue Machina", "Nastup", sans-serif; font-weight: 500; }
+.oc-menu-status {
+  color: var(--muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--line);
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+.oc-menu.open .oc-menu-btn { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+.oc-menu.open .oc-menu-list { opacity: 1; visibility: visible; transform: translateY(0); }
+.oc-menu-item:hover { color: var(--accent-cyan); }
+@media (hover: hover) {
+  .oc-menu:hover .oc-menu-btn { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+  .oc-menu:hover .oc-menu-list { opacity: 1; visibility: visible; transform: translateY(0); }
+}
+@media (max-width: 560px) {
+  .gateway-tools { gap: 6px; }
+  .gateway-header .logo-mark { font-size: 0.85rem; }
+  .oc-menu-label { display: none; }
+  .oc-menu-btn { padding: 6px 8px; }
 }
 
 /* металізований текст «Метаноя» з дзеркальним переливанням-блиском зверху (без глітчу) */
@@ -1294,6 +1358,45 @@ span[data-lang="en"] { display: none; }
   padding: 40px var(--gap) 10px;
 }
 .metanoia-contact .eyebrow { margin-bottom: 10px; }
+
+/* сторінка фестивалю METANOIA 2026: банер-рол і текст пресрелізу */
+.roll-trigger { cursor: zoom-in; background: #fff; }
+.roll-trigger img { height: auto; }
+.press-lead {
+  font-family: "Neue Machina", "Nastup", sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.2rem, 2.6vw, 1.75rem);
+  line-height: 1.2;
+  max-width: 820px;
+  margin: 8px 0 0;
+}
+.press-text { max-width: 760px; }
+.press-text p { color: #d8d8d6; }
+.press-text h3 {
+  font-family: "Neue Machina", "Nastup", sans-serif;
+  font-weight: 900;
+  font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+  line-height: 1.1;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+  margin: 44px 0 16px;
+}
+.press-text .press-pull {
+  font-family: "Neue Machina", "Nastup", sans-serif;
+  font-weight: 700;
+  color: var(--fg);
+  font-size: 1.15rem;
+  line-height: 1.35;
+  margin: 32px 0;
+}
+.press-text .press-coda {
+  font-family: "Neue Machina", "Nastup", sans-serif;
+  font-weight: 900;
+  color: var(--fg);
+  text-transform: uppercase;
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  line-height: 1.05;
+}
 .metanoia-contact a.mail-link {
   display: block;
   color: var(--fg);
