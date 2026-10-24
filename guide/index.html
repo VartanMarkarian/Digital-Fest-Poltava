@@ -1387,6 +1387,11 @@ button { font:inherit; color:inherit; }
 .intro { padding-block:28px 8px; }
 .intro h1 { font-family:var(--display); font-weight:900; font-size:clamp(34px,10vw,52px); line-height:.9; text-transform:uppercase; margin:0; text-wrap:balance; }
 .intro p { color:var(--dim); font-size:13px; line-height:1.55; margin:14px 0 0; max-width:60ch; }
+/* помітна кнопка повернення на сторінку фестивалю — для тих, хто прийшов з QR-коду */
+.festlink { display:inline-flex; align-items:center; gap:8px; margin-bottom:18px; padding:10px 14px; border:1px solid var(--rule); border-radius:999px;
+            font-family:var(--display); font-weight:700; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--fg); text-decoration:none;
+            transition:border-color .2s, color .2s; }
+.festlink:hover, .festlink:focus-visible { border-color:var(--accent); color:var(--accent); outline:none; }
 
 /* label replica */
 .label { display:grid; grid-template-columns:1fr auto; column-gap:14px; padding-block:24px; border-top:1px solid var(--rule);
@@ -1504,14 +1509,14 @@ const T = {
        arHint:"Наведіть камеру на підлогу, щоб розмістити скульптуру. Розмір — <b>1,5 м</b>, як у реальному просторі.",
        arNope:"Доповнена реальність працює на iPhone / iPad (Safari) та Android (Chrome). Відкрийте цю сторінку на телефоні, а тут можна покрутити модель.",
        arFail:"Не вдалося завантажити модель. Оновіть сторінку.", stills:"Кадри з роботи", swipe:"Гортайте вбік",
-       back:"← Усі роботи", home:"На головну", prev:"← Попередня", next:"Наступна →", draft:"Англійський переклад — чернетка, буде звірено з автором.",
+       back:"← Усі роботи", fest:"← Сторінка фестивалю METANOIA", home:"На головну", prev:"← Попередня", next:"Наступна →", draft:"Англійський переклад — чернетка, буде звірено з автором.",
        foot:"Полтавський художній музей (галерея мистецтв) імені Миколи Ярошенка · 16.10–1.11.2026 · digitalfestpoltava.com" },
   en:{ sub:"· guide", h1:"Works in the<br>exhibition", intro:"Find the label next to a work and open the same one here, or scan the QR code on the label. Numbers match the exhibition map, in order from the entrance.",
        open:"Read the concept →", fmt:"Format", dur:"Duration", year:"Year", concept:"Concept", listen:"Listen · coming soon", play:"Listen to the concept", pause:"Pause", speed:"Speed", ar:"View in augmented reality", arPlace:"Place in your space", arBack:"← Back to the work", arAlt:"3D sculpture",
        arHint:"Point the camera at the floor to place the sculpture. It appears at <b>1.5 m</b>, its real size.",
        arNope:"Augmented reality works on iPhone / iPad (Safari) and Android (Chrome). Open this page on your phone; here you can rotate the model.",
        arFail:"Could not load the model. Please reload the page.", stills:"Stills", swipe:"Swipe sideways",
-       back:"← All works", home:"Home", prev:"← Previous", next:"Next →", draft:"Draft translation, to be checked with the artist.",
+       back:"← All works", fest:"← METANOIA festival page", home:"Home", prev:"← Previous", next:"Next →", draft:"Draft translation, to be checked with the artist.",
        foot:"Mykola Yaroshenko Poltava Art Museum (Art Gallery) · 16.10–1.11.2026 · digitalfestpoltava.com" }
 };
 let lang = "ua";
@@ -1545,7 +1550,7 @@ function renderList() {
   const t = T[lang];
   nav.hidden = true;
   app.innerHTML = `<section class="view">
-    <div class="intro"><h1>${t.h1}</h1><p>${t.intro}</p></div>
+    <div class="intro"><a class="festlink" href="../metanoia-2026-festival.html">${t.fest}</a><h1>${t.h1}</h1><p>${t.intro}</p></div>
     ${WORKS.map(w => `<a class="row" href="#${w.id}"><span class="circ">${w.n}</span><span class="txt"><span class="nm">${esc(L(w, "name"))}</span><span class="tt">${esc(L(w, "t"))}</span></span><span class="go" aria-hidden="true">→</span></a>`).join("")}
     <div class="foot">${t.foot}</div></section>`;
 }

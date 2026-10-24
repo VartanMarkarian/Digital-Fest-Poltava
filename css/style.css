@@ -724,6 +724,202 @@ h1, h2, h3, .display {
   cursor: pointer;
 }
 .lightbox-close:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
+.lightbox-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 902;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--line);
+  background: var(--bg-panel);
+  color: var(--fg);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.lightbox-prev { left: 18px; }
+.lightbox-next { right: 18px; }
+.lightbox-nav:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
+.lightbox-count {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 902;
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+}
+@media (max-width: 680px) {
+  .pz-hint { white-space: normal; width: calc(100% - 32px); text-align: center; }
+  .lightbox-nav { width: 40px; height: 40px; }
+  .lightbox-prev { left: 8px; }
+  .lightbox-next { right: 8px; }
+}
+
+/* фотогалерея: дві безкінечні смуги, що пливуть назустріч одна одній */
+.photo-gallery-hint { color: var(--muted); font-size: 0.85rem; margin: -8px 0 24px; }
+.photo-strip {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.photo-strip::-webkit-scrollbar { display: none; }
+.photo-strip + .photo-strip { margin-top: 10px; }
+.photo-track { display: flex; gap: 10px; width: max-content; }
+.photo-item {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: #0a0a0b;
+  overflow: hidden;
+  cursor: zoom-in;
+}
+.photo-item img {
+  display: block;
+  /* обидві смуги разом із бігунком мають вміщуватися на екрані під шапкою */
+  height: clamp(120px, min(20vw, 25vh), 220px);
+  width: auto;
+  aspect-ratio: 3 / 2;
+  filter: saturate(0.85) brightness(0.9);
+  transition: filter 0.3s ease, transform 0.4s ease;
+}
+.photo-item:hover img,
+.photo-item:focus-visible img { filter: saturate(1.1) brightness(1.05); transform: scale(1.04); }
+.photo-item:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: -2px; }
+/* розділ «Путівник»: стіна етикеток робіт, кожна веде на свою роботу в путівнику */
+.guide-teaser-head {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px 48px;
+  align-items: end;
+  margin-bottom: 40px;
+}
+.guide-teaser-head .press-lead { margin: 0; }
+.guide-teaser-facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 18px 32px; }
+.guide-teaser-facts li { display: flex; flex-direction: column; gap: 4px; }
+.guide-teaser-facts b { font-family: "Neue Machina", "Nastup", sans-serif; font-weight: 900; font-size: 1.5rem; color: var(--fg); }
+.guide-teaser-facts span { color: var(--muted); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+.guide-wall {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 20px 14px;
+  padding: 8px 6px 40px;
+}
+.guide-pin {
+  position: relative;
+  display: block;
+  transform: rotate(var(--tilt, 0deg));
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+.guide-pin img { display: block; width: 100%; height: auto; }
+.guide-pin:hover,
+.guide-pin:focus-visible {
+  z-index: 2;
+  transform: rotate(0deg) scale(1.2);
+  filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.75)) brightness(1.08);
+  outline: none;
+}
+.guide-pin-n {
+  position: absolute;
+  left: -6px;
+  top: -8px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--fg);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Neue Machina", "Nastup", sans-serif;
+  font-weight: 700;
+  font-size: 0.66rem;
+}
+.guide-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 30px;
+  border: 1px solid var(--fg);
+  color: var(--fg);
+  text-decoration: none;
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.guide-cta:hover { border-color: var(--accent-cyan); background: rgba(55, 240, 224, 0.06); }
+.guide-cta-arrow { color: var(--accent-cyan); font-size: 1.2em; transition: transform 0.2s ease; }
+.guide-cta:hover .guide-cta-arrow { transform: translateX(6px); }
+@media (max-width: 1000px) { .guide-wall { grid-template-columns: repeat(9, 1fr); } }
+@media (max-width: 680px) {
+  .guide-teaser-head { grid-template-columns: 1fr; }
+  .guide-wall { grid-template-columns: repeat(5, 1fr); gap: 16px 10px; }
+  .guide-cta { padding: 14px 20px; }
+}
+
+/* навігація в шапці METANOIA: на телефоні «Путівник» переходить у меню-бургер */
+.metanoia-page [id] { scroll-margin-top: 80px; }
+/* шапка над лінзою (z-index 500), щоб меню, кнопки й мови ніколи не спотворювались */
+.metanoia-page .site-header { z-index: 600; }
+.site-header nav .nav-guide { display: none; }
+/* пункти меню в рамках — так само, як кнопка «Путівник» */
+@media (min-width: 681px) {
+  .metanoia-page .site-header nav { display: flex; gap: 10px; }
+  .metanoia-page .site-header nav a {
+    margin-left: 0;
+    padding: 5px 12px;
+    border: 1px solid var(--line);
+    color: var(--fg);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    opacity: 1;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .metanoia-page .site-header nav a:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+  .metanoia-page .site-header .header-right { gap: 10px; }
+}
+@media (max-width: 680px) {
+  .metanoia-page .site-header .header-link { display: none; }
+  .site-header nav .nav-guide { display: block; }
+}
+
+/* бігунок під смугами — рухає обидві одночасно */
+.photo-gallery-foot { display: flex; align-items: center; gap: 18px; margin-top: 22px; }
+.photo-gallery-count {
+  flex: none;
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.photo-scrub {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  margin: 0;
+  background: transparent;
+  cursor: grab;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.photo-scrub:active { cursor: grabbing; }
+.photo-scrub:focus { outline: none; }
+.photo-scrub::-webkit-slider-runnable-track { height: 2px; background: var(--line); }
+.photo-scrub::-moz-range-track { height: 2px; background: var(--line); }
+.photo-scrub::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 48px;
+  height: 14px;
+  margin-top: -6px;
+  border: 0;
+  border-radius: 0;
+  background: var(--accent-cyan);
+}
+.photo-scrub::-moz-range-thumb { width: 48px; height: 14px; border: 0; border-radius: 0; background: var(--accent-cyan); }
+.photo-scrub:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(55, 240, 224, 0.35); }
+.photo-scrub:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px rgba(55, 240, 224, 0.35); }
 
 /* ---------------- participants grid ---------------- */
 .participants-head {

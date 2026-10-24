@@ -17,6 +17,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const onMove = (e) => {
     targetX = e.clientX;
     targetY = e.clientY;
+    // над елементами з data-no-lens (напр. бігунок фотогалереї) лінза не потрібна
+    if (e.target.closest && e.target.closest("[data-no-lens]")) {
+      clearTimeout(idleTimer);
+      active = false;
+      lens.style.opacity = "0";
+      return;
+    }
     active = true;
     lens.style.opacity = "1";
     clearTimeout(idleTimer);

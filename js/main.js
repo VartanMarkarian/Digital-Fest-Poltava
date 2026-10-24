@@ -9,7 +9,86 @@ document.addEventListener("DOMContentLoaded", () => {
   initLightboxes();
   initMobileNav();
   initOpenCallsMenu();
+  initPhotoStrips();
 });
+
+/* Смуги фотогалереї пливуть назустріч одна одній і рухаються разом: від автопрокрутки,
+   свайпу будь-якої смуги чи бігунка під ними. Спільна позиція — частка від 0 до 1;
+   вміст кожної смуги задублений, тож на межі позиція замикається в кільце без стрибка. */
+function initPhotoStrips() {
+  const gallery = document.querySelector(".photo-gallery");
+  if (!gallery) return;
+  const strips = [...gallery.querySelectorAll(".photo-strip")];
+  const scrub = gallery.querySelector(".photo-scrub");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const SPEED = 28; // px за секунду
+
+  const half = (strip) => strip.scrollWidth / 2;
+  const forward = (strip) => (Number(strip.dataset.dir) || 1) > 0;
+  let phase = 0;
+  let paused = false;
+  let visible = false;
+  let scrubbing = false;
+  let last = 0;
+  let resumeTimer = null;
+  const applied = new Map();
+
+  const pause = () => {
+    paused = true;
+    clearTimeout(resumeTimer);
+  };
+  const resumeLater = (ms) => {
+    clearTimeout(resumeTimer);
+    resumeTimer = setTimeout(() => {
+      paused = false;
+    }, ms);
+  };
+  strips.forEach((strip) => {
+    strip.addEventListener("pointerenter", (e) => e.pointerType === "mouse" && pause());
+    strip.addEventListener("pointerleave", (e) => e.pointerType === "mouse" && resumeLater(300));
+    strip.addEventListener("touchstart", pause, { passive: true });
+    strip.addEventListener("touchend", () => resumeLater(2500), { passive: true });
+  });
+  if (scrub) {
+    scrub.addEventListener("input", () => {
+      scrubbing = true;
+      pause();
+      phase = scrub.value / 1000;
+    });
+    scrub.addEventListener("change", () => {
+      scrubbing = false;
+      resumeLater(2500);
+    });
+  }
+  new IntersectionObserver(([entry]) => {
+    visible = entry.isIntersecting;
+  }).observe(gallery);
+
+  const tick = (now) => {
+    const dt = last ? Math.min(now - last, 64) / 1000 : 0;
+    last = now;
+    // свайп чи прокрутка однієї смуги задає позицію для обох
+    for (const strip of strips) {
+      const h = half(strip);
+      if (h > 0 && applied.has(strip) && Math.abs(strip.scrollLeft - applied.get(strip)) > 2) {
+        const f = strip.scrollLeft / h;
+        phase = forward(strip) ? f : 1 - f;
+        break;
+      }
+    }
+    if (!reduceMotion && !paused && visible && !document.querySelector(".lightbox.open")) {
+      phase += (SPEED * dt) / (half(strips[0]) || 1);
+    }
+    phase = ((phase % 1) + 1) % 1;
+    for (const strip of strips) {
+      strip.scrollLeft = (forward(strip) ? phase : 1 - phase) * half(strip);
+      applied.set(strip, strip.scrollLeft);
+    }
+    if (scrub && !scrubbing) scrub.value = Math.round(phase * 1000);
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
 
 /* Меню OPEN CALLS: на комп'ютері відкривається наведенням (CSS),
    а натиск потрібен для сенсорних екранів і клавіатури */
@@ -167,6 +246,9 @@ function initLightboxes() {
     if (lightboxApis.has(lightbox)) return lightboxApis.get(lightbox);
 
     const closeBtn = lightbox.querySelector("[data-lightbox-close]");
+    const prevBtn = lightbox.querySelector("[data-lightbox-prev]");
+    const nextBtn = lightbox.querySelector("[data-lightbox-next]");
+    const counter = lightbox.querySelector("[data-lightbox-count]");
     const viewport = lightbox.querySelector(".pz-viewport");
     const image = lightbox.querySelector(".pz-image");
 
@@ -232,6 +314,7 @@ function initLightboxes() {
       const item = items[currentIndex];
       image.src = item.src;
       if (item.alt) image.alt = item.alt;
+      if (counter) counter.textContent = `${currentIndex + 1} / ${items.length}`;
       reset();
     };
     const next = () => openIndex(currentIndex + 1);
@@ -259,6 +342,8 @@ function initLightboxes() {
     };
 
     closeBtn.addEventListener("click", close);
+    if (prevBtn) prevBtn.addEventListener("click", prev);
+    if (nextBtn) nextBtn.addEventListener("click", next);
     lightbox.addEventListener("click", (e) => {
       if (e.target === lightbox) close();
     });
@@ -392,14 +477,16 @@ function initLightboxes() {
     return api;
   }
 
-  /* тригери з data-lightbox-src групуємо по спільному lightbox — це дає порядок для гортання */
+  /* тригери з data-lightbox-src групуємо по спільному lightbox — це дає порядок для гортання;
+     копії тих самих фото (у безкінечних смугах) додаються лише раз */
   const groups = new Map();
   triggers.forEach((trigger) => {
     const targetId = trigger.getAttribute("data-lightbox-target");
     const src = trigger.getAttribute("data-lightbox-src");
     if (!src) return;
     if (!groups.has(targetId)) groups.set(targetId, []);
-    groups.get(targetId).push({ src, alt: trigger.getAttribute("data-lightbox-alt") });
+    const group = groups.get(targetId);
+    if (!group.some((it) => it.src === src)) group.push({ src, alt: trigger.getAttribute("data-lightbox-alt") });
   });
 
   triggers.forEach((trigger) => {
