@@ -10,7 +10,23 @@ document.addEventListener("DOMContentLoaded", () => {
   initMobileNav();
   initOpenCallsMenu();
   initPhotoStrips();
+  initAnchorLinks();
 });
+
+/* Якорі в шапці прокручуємо самі: браузер не прокручує повторно,
+   якщо в адресі вже стоїть той самий #розділ */
+function initAnchorLinks() {
+  document.querySelectorAll('.site-header a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (e) => {
+      const hash = link.getAttribute("href");
+      const target = document.getElementById(hash.slice(1));
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      history.replaceState(null, "", hash);
+    });
+  });
+}
 
 /* Смуги фотогалереї пливуть назустріч одна одній і рухаються разом: від автопрокрутки,
    свайпу будь-якої смуги чи бігунка під ними. Спільна позиція — частка від 0 до 1;
