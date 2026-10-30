@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>AR test · Field of Memory</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; background:#0b0b0d; color:#e8e8ee; font:14px/1.45 system-ui, sans-serif; }
+  main { max-width:520px; margin:0 auto; padding:16px; }
+  h1 { font-size:18px; margin:4px 0 12px; }
+  .pick { display:flex; gap:8px; }
+  .pick button { flex:1; padding:10px; border-radius:10px; border:1px solid #444; background:#18181d; color:inherit; font:inherit; }
+  .pick button[aria-pressed="true"] { background:#d9dcff; color:#111; border-color:#d9dcff; }
+  model-viewer { display:block; width:100%; height:52vh; margin:12px 0; background:radial-gradient(ellipse at 50% 70%, #1d1d26, #0b0b0d 70%); }
+  #go { width:100%; padding:14px; border:0; border-radius:999px; background:#d9dcff; color:#111; font:600 14px system-ui; }
+  #go:disabled { opacity:.5; }
+  #log { margin-top:12px; padding:10px; border-radius:10px; background:#15151a; font:12px/1.5 ui-monospace, monospace; white-space:pre-wrap; word-break:break-word; }
+</style>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
+</head>
+<body>
+<main>
+  <h1>Тест AR · «Поле пам’яті»</h1>
+  <div class="pick">
+    <button type="button" data-src="ar/flower-1k.glb" aria-pressed="true">Текстури 1024 (3,3 МБ)</button>
+    <button type="button" data-src="ar/flower.glb" aria-pressed="false">Оригінал 2048 (4,3 МБ)</button>
+  </div>
+  <model-viewer id="mv" src="ar/flower-1k.glb" ios-src="ar/flower.usdz" alt="Field of Memory — 3D" ar ar-modes="webxr scene-viewer quick-look"
+    ar-scale="fixed" ar-placement="floor" camera-controls touch-action="pan-y" auto-rotate shadow-intensity="1" environment-image="neutral"
+    camera-orbit="30deg 70deg auto" interaction-prompt="none" loading="eager"><button slot="ar-button" hidden></button></model-viewer>
+  <button id="go" type="button" disabled>Розмістити в просторі</button>
+  <div id="log"></div>
+</main>
+<script>
+const mv = document.getElementById("mv"), go = document.getElementById("go"), logEl = document.getElementById("log");
+const t0 = performance.now();
+const log = m => { logEl.textContent += `${((performance.now() - t0) / 1000).toFixed(1)}s  ${m}\n`; };
+log(navigator.userAgent.replace(/^Mozilla\/5\.0 /, ""));
+log("WebXR: " + ("xr" in navigator ? "є" : "немає"));
+if (navigator.xr) navigator.xr.isSessionSupported("immersive-ar").then(ok => log("immersive-ar: " + (ok ? "підтримується" : "ні")), e => log("immersive-ar: помилка " + e));
+document.querySelectorAll(".pick button").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".pick button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  go.disabled = true; mv.src = b.dataset.src; log("модель → " + b.dataset.src);
+});
+mv.addEventListener("load", () => { log("модель завантажена"); setTimeout(() => { go.disabled = false; log("AR доступний: " + mv.canActivateAR); }, 1200); });
+mv.addEventListener("error", e => log("помилка моделі: " + (e.detail && e.detail.type)));
+mv.addEventListener("ar-status", e => log("ar-status: " + e.detail.status));
+mv.addEventListener("ar-tracking", e => log("ar-tracking: " + e.detail.status));
+go.onclick = () => { log("натиснуто"); mv.activateAR(); };
+</script>
+</body>
+</html>
