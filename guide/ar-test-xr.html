@@ -11,7 +11,8 @@
   main { max-width:520px; margin:0 auto; padding:16px; }
   h1 { font-size:18px; margin:4px 0 8px; }
   p { color:#b9b9c6; margin:0 0 12px; }
-  .pick { display:flex; gap:8px; margin-bottom:12px; }
+  .pick { display:flex; gap:8px; margin-bottom:8px; }
+  #modes button { font-size:12px; }
   .pick button { flex:1; padding:10px; border-radius:10px; border:1px solid #444; background:#18181d; color:inherit; font:inherit; }
   .pick button[aria-pressed="true"] { background:#d9dcff; color:#111; border-color:#d9dcff; }
   #go { width:100%; padding:14px; border:0; border-radius:999px; background:#d9dcff; color:#111; font:600 14px system-ui; }
@@ -28,6 +29,7 @@
 <main>
   <h1>Тест 4 · AR без накладок сторінки</h1>
   <p>Власний переглядач (three.js), як офіційний приклад WebXR: без хрестика й підказок поверх камери. Після запуску поводіть телефоном над підлогою — скульптура стане сама, дотик переставляє її. Вийти — жестом «назад».</p>
+  <div class="pick" id="modes"></div>
   <div class="pick" id="models">
     <button type="button" data-src="ar/flower-1k.glb" aria-pressed="true">Текстури 1024</button>
     <button type="button" data-src="ar/flower.glb" aria-pressed="false">Оригінал 2048</button>
@@ -40,12 +42,20 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
+// ?mode= picks how three.js draws into the AR session: layers (its default when the browser offers WebXR Layers),
+// classic (XRWebGLLayer, like the official WebXR sample), classic-noaa (classic without antialiasing)
+const MODES = { classic: "Класичний шар", "classic-noaa": "Класичний, без згладж.", layers: "WebXR Layers" };
+const MODE = MODES[new URLSearchParams(location.search).get("mode")] ? new URLSearchParams(location.search).get("mode") : "classic";
+if (MODE !== "layers" && typeof XRRenderState !== "undefined" && "layers" in XRRenderState.prototype)
+  Object.defineProperty(XRRenderState.prototype, "layers", { get() { return undefined; }, configurable: true });
+document.getElementById("modes").innerHTML = Object.entries(MODES).map(([k, v]) => `<button type="button" aria-pressed="${k === MODE}" data-mode="${k}">${v}</button>`).join("");
+document.querySelectorAll("#modes button").forEach(b => b.onclick = () => { location.search = "?mode=" + b.dataset.mode; });
 const go = document.getElementById("go"), logEl = document.getElementById("log"), t0 = performance.now();
 const log = m => { logEl.textContent += `${((performance.now() - t0) / 1000).toFixed(1)}s  ${m}\n`; };
 log(navigator.userAgent.replace(/^Mozilla\/5\.0 /, ""));
-log("three.js " + THREE.REVISION + ", без DOM overlay");
+log("three.js " + THREE.REVISION + ", без DOM overlay, режим: " + MODES[MODE]);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({ antialias: MODE !== "classic-noaa", alpha: true });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
 renderer.xr.enabled = true;
@@ -89,6 +99,7 @@ go.onclick = async () => {
     renderer.xr.setReferenceSpaceType("local");
     await renderer.xr.setSession(session);
     renderer.domElement.style.display = "block";
+    log("малюю через " + (session.renderState.baseLayer ? "XRWebGLLayer (класичний)" : "WebXR Layers (projection layer)"));
     placed = false; frames = 0; hits = 0; if (model) model.visible = false;
     const viewer = await session.requestReferenceSpace("viewer");
     hitSource = await session.requestHitTestSource({ space: viewer });
