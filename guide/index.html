@@ -1589,20 +1589,13 @@ function loadModelViewer() {
   return mvLib ||= new Promise((ok, fail) => { const s = document.createElement("script"); s.type = "module";
     s.src = "https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"; s.onload = ok; s.onerror = fail; document.head.appendChild(s); });
 }
-// Same intent model-viewer builds for Scene Viewer: AR on the floor, fixed 1:1 scale, back to this view on failure
-let svFailed = false;   // set once Scene Viewer could not open (Google app missing): don't offer it again
-function sceneViewerIntent(w) {
-  const file = new URL(w.ar, location.href).href, back = location.href.split("#")[0] + "#" + w.id + "-ar-nosv";
-  return `intent://arvr.google.com/scene-viewer/1.2?mode=ar_preferred&resizable=false&disable_occlusion=true&file=${encodeURIComponent(file)}` +
-    `#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(back)};end;`;
-}
 function renderAR(i) {
   const w = WORKS[i], t = T[lang];
   nav.hidden = true;
   app.innerHTML = `<section class="view detail ar">
     <button class="back" type="button" id="back">${t.arBack}</button>
     <div class="label" style="padding-bottom:0"><div><div class="circ">${w.n}</div><h2>${esc(L(w, "t"))}</h2><div class="sub">${esc(L(w, "name"))}</div></div></div>
-    <model-viewer id="mv" src="${w.ar}" ios-src="${w.ar_ios || ""}" alt="${esc(L(w, "t"))} — ${t.arAlt}" ar ar-modes="scene-viewer webxr quick-look" ar-scale="fixed" ar-placement="floor"
+    <model-viewer id="mv" src="${w.ar}" ios-src="${w.ar_ios || ""}" alt="${esc(L(w, "t"))} — ${t.arAlt}" ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" ar-placement="floor"
       camera-controls touch-action="pan-y" auto-rotate auto-rotate-delay="0" rotation-per-second="18deg" shadow-intensity="1"
       environment-image="neutral" camera-orbit="30deg 70deg auto" interaction-prompt="none" loading="eager"><button slot="ar-button" hidden></button></model-viewer>
     <button class="arbtn" id="arBtn" type="button" disabled>${ICON_AR}<span>${t.arPlace}</span></button>
@@ -1611,10 +1604,9 @@ function renderAR(i) {
   document.getElementById("back").onclick = () => { location.hash = w.id; };
   const mv = document.getElementById("mv"), btn = document.getElementById("arBtn"), note = document.getElementById("arNote");
   btn.hidden = !(isIOS || isAndroid);
-  // Android browsers model-viewer skips (Firefox etc.) still get Google Scene Viewer via a direct intent
-  btn.onclick = () => { if (mv.canActivateAR) mv.activateAR(); else if (isAndroid && !svFailed) location.href = sceneViewerIntent(w); };
+  btn.onclick = () => mv.activateAR();
   // canActivateAR settles shortly after load (WebXR support check is async)
-  const syncAR = () => { const ok = mv.canActivateAR || (isAndroid && !svFailed); btn.disabled = false; btn.hidden = !ok; note.innerHTML = ok ? t.arHint : t.arNope; };
+  const syncAR = () => { btn.disabled = false; btn.hidden = !mv.canActivateAR; note.innerHTML = mv.canActivateAR ? t.arHint : t.arNope; };
   mv.addEventListener("load", () => { syncAR(); setTimeout(syncAR, 1200); });
   mv.addEventListener("ar-status", e => { if (e.detail.status === "failed") note.innerHTML = t.arNope; });
   mv.addEventListener("error", () => { note.textContent = t.arFail; });
@@ -1644,9 +1636,6 @@ function wirePlayer() {
   seek.oninput = () => { if (au.duration) au.currentTime = seek.value / 1000 * au.duration; };
 }
 function route() {
-  // model-viewer sets this hash when Scene Viewer can't open, then steps back in history itself
-  if (location.hash === "#model-viewer-no-ar-fallback") { svFailed = true; return; }
-  if (location.hash.endsWith("-ar-nosv")) { svFailed = true; history.replaceState(null, "", location.hash.slice(0, -5)); }
   document.documentElement.lang = lang === "en" ? "en" : "uk";
   document.getElementById("brandSub").textContent = T[lang].sub;
   document.getElementById("lang-ua").setAttribute("aria-pressed", lang === "ua");
