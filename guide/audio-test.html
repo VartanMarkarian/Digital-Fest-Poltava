@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Audio test · METANOIA guide</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; background:#0b0b0d; color:#e8e8ee; font:14px/1.45 system-ui, sans-serif; }
+  main { max-width:520px; margin:0 auto; padding:16px; }
+  h1 { font-size:18px; margin:4px 0 8px; }
+  p { color:#b9b9c6; margin:0 0 12px; }
+  .pick { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+  .pick button { padding:10px; border-radius:10px; border:1px solid #444; background:#18181d; color:inherit; font:inherit; font-size:13px; }
+  .pick button[aria-pressed="true"] { background:#d9dcff; color:#111; border-color:#d9dcff; }
+  #go { width:100%; padding:14px; border:0; border-radius:999px; background:#d9dcff; color:#111; font:600 14px system-ui; }
+  audio { width:100%; margin-top:12px; }
+  #log { margin-top:12px; padding:10px; border-radius:10px; background:#15151a; font:12px/1.5 ui-monospace, monospace; white-space:pre-wrap; word-break:break-word; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Тест аудіо путівника</h1>
+  <p>Оберіть варіант, натисніть «Слухати» і дочекайтесь, поки звук зупиниться (або 15 с). Потім зробіть скриншот логу. Повторіть для кожного варіанту.</p>
+  <div class="pick" id="modes"></div>
+  <button id="go" type="button">▶ Слухати / ❚❚ пауза</button>
+  <div id="slot"></div>
+  <div id="log"></div>
+</main>
+<script>
+// Same file and player setup as the guide (work 12, UA narration); variants change only how the audio is loaded
+const SRC = "a/ua/w12-b926776f.mp3";
+const MODES = {
+  guide: "A · як у путівнику",
+  auto: "B · preload=auto",
+  blob: "C · файл повністю, потім грати",
+  native: "D · стандартний плеєр браузера",
+};
+const q = new URLSearchParams(location.search).get("mode"), MODE = MODES[q] ? q : "guide";
+document.getElementById("modes").innerHTML = Object.entries(MODES).map(([k, v]) => `<button type="button" aria-pressed="${k === MODE}" data-mode="${k}">${v}</button>`).join("");
+document.querySelectorAll("#modes button").forEach(b => b.onclick = () => { location.search = "?mode=" + b.dataset.mode; });
+
+const logEl = document.getElementById("log"), t0 = performance.now();
+const log = m => { logEl.textContent += `${((performance.now() - t0) / 1000).toFixed(1)}s  ${m}\n`; };
+log(navigator.userAgent.replace(/^Mozilla\/5\.0 /, ""));
+log("варіант: " + MODES[MODE]);
+
+const au = document.createElement("audio");
+au.preload = MODE === "auto" ? "auto" : "metadata";
+if (MODE === "native") au.controls = true;
+document.getElementById("slot").appendChild(au);
+const st = () => { const b = au.buffered.length ? au.buffered.end(au.buffered.length - 1).toFixed(1) : "0";
+  return `t=${au.currentTime.toFixed(1)} буфер=${b}/${isFinite(au.duration) ? au.duration.toFixed(1) : "?"} ready=${au.readyState} net=${au.networkState}`; };
+["loadedmetadata", "canplay", "canplaythrough", "play", "playing", "pause", "waiting", "stalled", "suspend", "abort", "emptied", "ended", "ratechange", "seeking", "seeked"]
+  .forEach(ev => au.addEventListener(ev, () => log(`${ev} · ${st()}${ev === "pause" ? " · вкладка " + document.visibilityState : ""}`)));
+au.addEventListener("error", () => log("error " + (au.error && au.error.code) + " " + (au.error && au.error.message)));
+let lastTick = 0;
+au.addEventListener("timeupdate", () => { if (au.currentTime - lastTick >= 2) { lastTick = au.currentTime; log("грає · " + st()); } });
+document.addEventListener("visibilitychange", () => log("вкладка: " + document.visibilityState));
+
+// guide player sets playback rate from saved preference on load
+const rate = (() => { try { return +localStorage.getItem("metanoia-rate") || 1; } catch (e) { return 1; } })();
+if (MODE === "guide") { au.playbackRate = rate; au.defaultPlaybackRate = rate;
+  au.addEventListener("loadedmetadata", () => { au.playbackRate = rate; }); log("швидкість з путівника: ×" + rate); }
+
+if (MODE === "blob") {
+  log("завантажую файл повністю…");
+  fetch(SRC).then(r => { log(`відповідь ${r.status} ${r.headers.get("content-type")}`); return r.blob(); })
+    .then(b => { log(`завантажено ${(b.size / 1024).toFixed(0)} КБ`); au.src = URL.createObjectURL(new Blob([b], { type: "audio/mpeg" })); })
+    .catch(e => log("помилка завантаження: " + e));
+} else au.src = SRC;
+
+document.getElementById("go").onclick = () => {
+  if (au.paused) { log("натиснуто ▶"); au.play().then(() => log("play() ok"), e => log("play() відхилено: " + e.name + " " + e.message)); }
+  else { log("натиснуто ❚❚"); au.pause(); }
+};
+</script>
+</body>
+</html>
