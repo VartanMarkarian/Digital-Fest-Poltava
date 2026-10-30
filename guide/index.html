@@ -1506,14 +1506,14 @@ const SHOTS = {"w12":[["img/shots/w12-1.webp",1100,618,null],["img/shots/w12-2.w
 const T = {
   ua:{ sub:"· путівник", h1:"Роботи<br>виставки", intro:"Знайдіть етикетку біля роботи і відкрийте таку саму тут, або скануйте QR-код на етикетці. Номери ті самі, що на мапі виставки, по порядку від входу.",
        open:"Читати концепцію →", fmt:"Формат", dur:"Тривалість", year:"Рік", concept:"Концепція", listen:"Слухати · незабаром", play:"Слухати концепцію", pause:"Пауза", speed:"Швидкість", ar:"Дивитися в доповненій реальності", arPlace:"Розмістити в просторі", arBack:"← До роботи", arAlt:"3D-скульптура",
-       arHint:"Наведіть камеру на підлогу, щоб розмістити скульптуру. Розмір — <b>1,5 м</b>, як у реальному просторі.",
+       arHint:"Наведіть камеру на підлогу, щоб розмістити скульптуру. Розмір — <b>1,5 м</b>, як у реальному просторі. Якщо вона не з’являється — повільно поводіть телефоном над освітленою ділянкою підлоги.",
        arNope:"Доповнена реальність працює на iPhone / iPad (Safari) та Android (Chrome). Відкрийте цю сторінку на телефоні, а тут можна покрутити модель.",
        arFail:"Не вдалося завантажити модель. Оновіть сторінку.", stills:"Кадри з роботи", swipe:"Гортайте вбік",
        back:"← Усі роботи", fest:"← Сторінка фестивалю METANOIA", home:"На головну", prev:"← Попередня", next:"Наступна →", draft:"Англійський переклад — чернетка, буде звірено з автором.",
        foot:"Полтавський художній музей (галерея мистецтв) імені Миколи Ярошенка · 16.10–1.11.2026 · digitalfestpoltava.com" },
   en:{ sub:"· guide", h1:"Works in the<br>exhibition", intro:"Find the label next to a work and open the same one here, or scan the QR code on the label. Numbers match the exhibition map, in order from the entrance.",
        open:"Read the concept →", fmt:"Format", dur:"Duration", year:"Year", concept:"Concept", listen:"Listen · coming soon", play:"Listen to the concept", pause:"Pause", speed:"Speed", ar:"View in augmented reality", arPlace:"Place in your space", arBack:"← Back to the work", arAlt:"3D sculpture",
-       arHint:"Point the camera at the floor to place the sculpture. It appears at <b>1.5 m</b>, its real size.",
+       arHint:"Point the camera at the floor to place the sculpture. It appears at <b>1.5 m</b>, its real size. If it doesn’t appear, slowly move the phone over a well-lit patch of floor.",
        arNope:"Augmented reality works on iPhone / iPad (Safari) and Android (Chrome). Open this page on your phone; here you can rotate the model.",
        arFail:"Could not load the model. Please reload the page.", stills:"Stills", swipe:"Swipe sideways",
        back:"← All works", fest:"← METANOIA festival page", home:"Home", prev:"← Previous", next:"Next →", draft:"Draft translation, to be checked with the artist.",
@@ -1589,13 +1589,20 @@ function loadModelViewer() {
   return mvLib ||= new Promise((ok, fail) => { const s = document.createElement("script"); s.type = "module";
     s.src = "https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"; s.onload = ok; s.onerror = fail; document.head.appendChild(s); });
 }
+// Same intent model-viewer builds for Scene Viewer: AR on the floor, fixed 1:1 scale, back to this view on failure
+let svFailed = false;   // set once Scene Viewer could not open (Google app missing): don't offer it again
+function sceneViewerIntent(w) {
+  const file = new URL(w.ar, location.href).href, back = location.href.split("#")[0] + "#" + w.id + "-ar-nosv";
+  return `intent://arvr.google.com/scene-viewer/1.2?mode=ar_preferred&resizable=false&disable_occlusion=true&file=${encodeURIComponent(file)}` +
+    `#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(back)};end;`;
+}
 function renderAR(i) {
   const w = WORKS[i], t = T[lang];
   nav.hidden = true;
   app.innerHTML = `<section class="view detail ar">
     <button class="back" type="button" id="back">${t.arBack}</button>
     <div class="label" style="padding-bottom:0"><div><div class="circ">${w.n}</div><h2>${esc(L(w, "t"))}</h2><div class="sub">${esc(L(w, "name"))}</div></div></div>
-    <model-viewer id="mv" src="${w.ar}" ios-src="${w.ar_ios || ""}" alt="${esc(L(w, "t"))} — ${t.arAlt}" ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" ar-placement="floor"
+    <model-viewer id="mv" src="${w.ar}" ios-src="${w.ar_ios || ""}" alt="${esc(L(w, "t"))} — ${t.arAlt}" ar ar-modes="scene-viewer webxr quick-look" ar-scale="fixed" ar-placement="floor"
       camera-controls touch-action="pan-y" auto-rotate auto-rotate-delay="0" rotation-per-second="18deg" shadow-intensity="1"
       environment-image="neutral" camera-orbit="30deg 70deg auto" interaction-prompt="none" loading="eager"><button slot="ar-button" hidden></button></model-viewer>
     <button class="arbtn" id="arBtn" type="button" disabled>${ICON_AR}<span>${t.arPlace}</span></button>
@@ -1604,9 +1611,10 @@ function renderAR(i) {
   document.getElementById("back").onclick = () => { location.hash = w.id; };
   const mv = document.getElementById("mv"), btn = document.getElementById("arBtn"), note = document.getElementById("arNote");
   btn.hidden = !(isIOS || isAndroid);
-  btn.onclick = () => mv.activateAR();
+  // Android browsers model-viewer skips (Firefox etc.) still get Google Scene Viewer via a direct intent
+  btn.onclick = () => { if (mv.canActivateAR) mv.activateAR(); else if (isAndroid && !svFailed) location.href = sceneViewerIntent(w); };
   // canActivateAR settles shortly after load (WebXR support check is async)
-  const syncAR = () => { btn.disabled = false; btn.hidden = !mv.canActivateAR; note.innerHTML = mv.canActivateAR ? t.arHint : t.arNope; };
+  const syncAR = () => { const ok = mv.canActivateAR || (isAndroid && !svFailed); btn.disabled = false; btn.hidden = !ok; note.innerHTML = ok ? t.arHint : t.arNope; };
   mv.addEventListener("load", () => { syncAR(); setTimeout(syncAR, 1200); });
   mv.addEventListener("ar-status", e => { if (e.detail.status === "failed") note.innerHTML = t.arNope; });
   mv.addEventListener("error", () => { note.textContent = t.arFail; });
@@ -1636,6 +1644,9 @@ function wirePlayer() {
   seek.oninput = () => { if (au.duration) au.currentTime = seek.value / 1000 * au.duration; };
 }
 function route() {
+  // model-viewer sets this hash when Scene Viewer can't open, then steps back in history itself
+  if (location.hash === "#model-viewer-no-ar-fallback") { svFailed = true; return; }
+  if (location.hash.endsWith("-ar-nosv")) { svFailed = true; history.replaceState(null, "", location.hash.slice(0, -5)); }
   document.documentElement.lang = lang === "en" ? "en" : "uk";
   document.getElementById("brandSub").textContent = T[lang].sub;
   document.getElementById("lang-ua").setAttribute("aria-pressed", lang === "ua");
