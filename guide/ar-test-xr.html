@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>AR test 4 · Field of Memory</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; background:#0b0b0d; color:#e8e8ee; font:14px/1.45 system-ui, sans-serif; }
+  main { max-width:520px; margin:0 auto; padding:16px; }
+  h1 { font-size:18px; margin:4px 0 8px; }
+  p { color:#b9b9c6; margin:0 0 12px; }
+  .pick { display:flex; gap:8px; margin-bottom:12px; }
+  .pick button { flex:1; padding:10px; border-radius:10px; border:1px solid #444; background:#18181d; color:inherit; font:inherit; }
+  .pick button[aria-pressed="true"] { background:#d9dcff; color:#111; border-color:#d9dcff; }
+  #go { width:100%; padding:14px; border:0; border-radius:999px; background:#d9dcff; color:#111; font:600 14px system-ui; }
+  #go:disabled { opacity:.5; }
+  #log { margin-top:12px; padding:10px; border-radius:10px; background:#15151a; font:12px/1.5 ui-monospace, monospace; white-space:pre-wrap; word-break:break-word; }
+  canvas { display:none; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+<main>
+  <h1>Тест 4 · AR без накладок сторінки</h1>
+  <p>Власний переглядач (three.js), як офіційний приклад WebXR: без хрестика й підказок поверх камери. Після запуску поводіть телефоном над підлогою — скульптура стане сама, дотик переставляє її. Вийти — жестом «назад».</p>
+  <div class="pick" id="models">
+    <button type="button" data-src="ar/flower-1k.glb" aria-pressed="true">Текстури 1024</button>
+    <button type="button" data-src="ar/flower.glb" aria-pressed="false">Оригінал 2048</button>
+  </div>
+  <button id="go" type="button" disabled>Розмістити в просторі</button>
+  <div id="log"></div>
+</main>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const go = document.getElementById("go"), logEl = document.getElementById("log"), t0 = performance.now();
+const log = m => { logEl.textContent += `${((performance.now() - t0) / 1000).toFixed(1)}s  ${m}\n`; };
+log(navigator.userAgent.replace(/^Mozilla\/5\.0 /, ""));
+log("three.js " + THREE.REVISION + ", без DOM overlay");
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(devicePixelRatio);
+renderer.setSize(innerWidth, innerHeight);
+renderer.xr.enabled = true;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.01, 50);
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x444455, 1));
+
+const reticle = new THREE.Mesh(new THREE.RingGeometry(0.12, 0.15, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xd9dcff }));
+reticle.matrixAutoUpdate = false; reticle.visible = false; scene.add(reticle);
+
+let model = null, placed = false, src = "ar/flower-1k.glb";
+const loader = new GLTFLoader();
+function load() {
+  go.disabled = true; if (model) { scene.remove(model); model = null; }
+  loader.load(src, g => { model = g.scene; model.visible = false; scene.add(model); go.disabled = false; log("модель завантажена: " + src); },
+              undefined, e => log("помилка моделі: " + e));
+}
+document.querySelectorAll("#models button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("#models button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  src = b.dataset.src; load();
+});
+load();
+
+const place = () => { if (!model || !reticle.visible) return; model.position.setFromMatrixPosition(reticle.matrix); model.visible = true;
+                      if (!placed) { placed = true; log("скульптура розміщена"); } };
+const controller = renderer.xr.getController(0);
+controller.addEventListener("select", place);
+scene.add(controller);
+
+let hitSource = null, frames = 0, hits = 0;
+navigator.xr?.isSessionSupported("immersive-ar").then(ok => log("immersive-ar: " + (ok ? "підтримується" : "ні")));
+
+go.onclick = async () => {
+  log("натиснуто");
+  try {
+    const session = await navigator.xr.requestSession("immersive-ar", { requiredFeatures: ["hit-test"] });
+    log("сесія почалась");
+    renderer.xr.setReferenceSpaceType("local");
+    await renderer.xr.setSession(session);
+    renderer.domElement.style.display = "block";
+    placed = false; frames = 0; hits = 0; if (model) model.visible = false;
+    const viewer = await session.requestReferenceSpace("viewer");
+    hitSource = await session.requestHitTestSource({ space: viewer });
+    session.addEventListener("end", () => { hitSource = null; renderer.domElement.style.display = "none";
+                                            log(`сесія завершена · кадрів ${frames}, кадрів з підлогою ${hits}`); });
+  } catch (e) { log("не вдалося запустити: " + e.message); }
+};
+
+renderer.setAnimationLoop((t, frame) => {
+  if (frame && hitSource) {
+    frames++;
+    const res = frame.getHitTestResults(hitSource);
+    if (res.length) {
+      hits++;
+      const pose = res[0].getPose(renderer.xr.getReferenceSpace());
+      reticle.visible = true; reticle.matrix.fromArray(pose.transform.matrix);
+      if (!placed) { if (hits === 1) log("підлогу знайдено"); place(); }
+    } else reticle.visible = false;
+  }
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
